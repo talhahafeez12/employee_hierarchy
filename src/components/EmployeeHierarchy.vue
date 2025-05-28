@@ -6,9 +6,20 @@
     const cols = all_employees[0].split(",");
     const cols_index = {};
     for (var index in cols) {
-        cols_index[cols[index].trim()] = index;
+        cols_index[cols[index].trim()] = parseInt(index);
     }
     all_employees = all_employees.slice(1);
+    var layer_index = cols_index['level'];
+    var location_index = cols_index['Location'];
+    if (location_index < layer_index) {
+        layer_index += 1;
+    }
+    function for_sorting(e1, e2) {
+        let e1_vals = e1.split(",");
+        let e2_vals = e2.split(",");
+        return parseInt(e1_vals[layer_index]) - parseInt(e2_vals[layer_index]);
+    }
+    all_employees.sort(for_sorting);
 
     // Sort by layer later if required.
     const employee_hierarchy_ids = {};
@@ -22,15 +33,15 @@
     for (var i in all_employees) {
         var index = all_employees.length - i - 1;
         var employee = all_employees[index].split(',');
-        var employee_first = employee.slice(0, parseInt(cols_index['Location']));
-        employee_first.push(employee[parseInt(cols_index['Location'])] + "," + employee[parseInt(cols_index['Location']) + 1]);
-        var employee_second = employee.slice(parseInt(cols_index['Location']) + 2);
+        var employee_first = employee.slice(0, cols_index['Location']);
+        employee_first.push(employee[cols_index['Location']] + "," + employee[cols_index['Location'] + 1]);
+        var employee_second = employee.slice(cols_index['Location'] + 2);
         employee_first.push(...employee_second);
         employee = employee_first;
-        var id = employee[parseInt(cols_index['Employee Id'])];
-        var manager = employee[parseInt(cols_index['Manager'])];
-        var salary = parseFloat(employee[parseInt(cols_index['Salary'])]);
-        var new_layer = employee[parseInt(cols_index['level'])].trim("\r");
+        var id = employee[cols_index['Employee Id']];
+        var manager = employee[cols_index['Manager']];
+        var salary = parseFloat(employee[cols_index['Salary']]);
+        var new_layer = employee[cols_index['level']].trim("\r");
         employee_salary[id] = salary;
         if (layer != new_layer) {
             divs.push({id: new_layer, class: new_layer, content:[]});
